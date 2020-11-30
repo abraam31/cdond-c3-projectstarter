@@ -134,7 +134,7 @@ jobs:
 
 
 workflows:
-  default:
+  node-tests:
     jobs:
       - build-frontend
       - build-backend
@@ -146,3 +146,4 @@ workflows:
           requires: [test-backend]
       - scan-frontend:
           requires: [test-frontend]
+
