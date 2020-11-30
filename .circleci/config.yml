@@ -37,7 +37,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build"
+          key: "frontend-build1"
       - run:
           name: Build front-end
           command: |
@@ -47,7 +47,7 @@ jobs:
       - save_cache:
           paths: 
             - frontend/src/modules
-          key: "frontend-build"
+          key: "frontend-build1"
       - exit-pipeline
 
   build-backend:
@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build"
+          key: "backend-build1"
       - run:
           name: Back-end build
           command: |
@@ -66,7 +66,7 @@ jobs:
       - save_cache:
           paths: 
             - backend/src/modules
-          key: backend-build
+          key: backend-build1
       - exit-pipeline
 
   test-frontend:
@@ -75,7 +75,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build"
+          key: "frontend-build1"
       - run:
           name: Test front-end
           command: |
@@ -85,7 +85,7 @@ jobs:
       - save_cache:
           paths: 
             - frontend/src/modules
-          key: "frontend-build"
+          key: "frontend-build1"
       - exit-pipeline
           
   test-backend:
@@ -94,7 +94,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build"
+          key: "backend-build1"
       - run: 
             name: various commands 
             command: |
@@ -111,7 +111,7 @@ jobs:
       - save_cache:
           paths: 
             - backend/src/modules
-          key: backend-build
+          key: backend-build1
       - exit-pipeline
             
   scan-frontend:
