@@ -42,12 +42,12 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            npm i
+            npm install -g
             npm run build
       - save_cache:
           paths: 
-            - frontend/src/modules
-          key: "frontend-build1"
+            - frontend/src
+          key: "frontend-build2"
       - exit-pipeline
 
   build-backend:
@@ -56,17 +56,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build1"
+          key: "backend-build2"
       - run:
           name: Back-end build
           command: |
             cd backend
-            npm i
+            npm install -g
             npm run build
       - save_cache:
           paths: 
-            - backend/src/modules
-          key: backend-build1
+            - backend/src/
+          key: backend-build2
       - exit-pipeline
 
   test-frontend:
@@ -80,12 +80,12 @@ jobs:
           name: Test front-end
           command: |
             cd frontend
-            npm i
+            npm install -g
             npm run test
       - save_cache:
           paths: 
-            - frontend/src/modules
-          key: "frontend-build1"
+            - frontend/src
+          key: "frontend-build2"
       - exit-pipeline
           
   test-backend:
@@ -94,24 +94,24 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build1"
+          key: "backend-build2"
       - run: 
             name: various commands 
             command: |
-                cat backend/src/modules/domain/employees/commands/handlers/employee-activator.handler.spec.ts
                 ls
                 pwd
+                ls backend 
             
       - run:
           name: Back-end test
           command: |
             cd backend
-            npm i
+            npm install -g
             npm run test
       - save_cache:
           paths: 
-            - backend/src/modules
-          key: backend-build1
+            - backend/src
+          key: backend-build2
       - exit-pipeline
             
   scan-frontend:
