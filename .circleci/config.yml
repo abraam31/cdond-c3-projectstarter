@@ -123,7 +123,7 @@ jobs:
           name: Frontend audit
           command: |
             cd backend
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - exit-pipeline
 
   scan-backend:
@@ -135,7 +135,7 @@ jobs:
           name: Back-end audit
           command: |
             cd backend
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical --force
       - exit-pipeline
 
 
