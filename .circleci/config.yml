@@ -37,7 +37,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build3"
+          key: "frontend-build4"
       - run:
           name: Build front-end
           command: |
@@ -46,8 +46,8 @@ jobs:
             npm run build
       - save_cache:
           paths: 
-            - frontend/src
-          key: "frontend-build3"
+            - frontend/node_modules
+          key: "frontend-build4"
       - exit-pipeline
 
   build-backend:
@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build3"
+          key: "backend-build4"
       - run:
           name: Back-end build
           command: |
@@ -65,8 +65,8 @@ jobs:
             npm run build
       - save_cache:
           paths: 
-            - backend/src/
-          key: backend-build3
+            - backend/node_modules
+          key: backend-build4
       - exit-pipeline
 
   test-frontend:
@@ -75,7 +75,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build3"
+          key: "frontend-build4"
       - run:
           name: Test front-end
           command: |
@@ -84,8 +84,8 @@ jobs:
             npm run test
       - save_cache:
           paths: 
-            - frontend/src
-          key: "frontend-build3"
+            - frontend/node_modules
+          key: "frontend-build4"
       - exit-pipeline
           
   test-backend:
@@ -94,7 +94,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build3"
+          key: "backend-build4"
       - run: 
             name: various commands 
             command: |
@@ -110,7 +110,7 @@ jobs:
             npm run test
       - save_cache:
           paths: 
-            - backend/src
+            - backend/node_modules
           key: backend-build3
       - exit-pipeline
             
