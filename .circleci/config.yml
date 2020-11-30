@@ -1,6 +1,16 @@
 version: 2.1
 
 commands:
+
+  exit-pipeline:
+    description: exit pipeline if job fails
+    steps:
+      - run:
+          name: exit pipeline
+          when: on_fail
+          command: |
+            exit 1
+
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
@@ -38,6 +48,7 @@ jobs:
           paths: 
             - frontend/src/modules
           key: "frontend-build"
+      - exit-pipeline
 
   build-backend:
     docker:
@@ -56,6 +67,7 @@ jobs:
           paths: 
             - backend/src/modules
           key: backend-build
+      - exit-pipeline
 
   test-frontend:
     docker:
@@ -74,6 +86,7 @@ jobs:
           paths: 
             - frontend/src/modules
           key: "frontend-build"
+      - exit-pipeline
           
   test-backend:
     docker:
@@ -92,6 +105,7 @@ jobs:
           paths: 
             - backend/src/modules
           key: backend-build
+      - exit-pipeline
             
   scan-frontend:
     docker:
@@ -103,6 +117,7 @@ jobs:
           command: |
             cd backend
             npm audit --audit-level=critical
+      - exit-pipeline
 
   scan-backend:
     docker:
@@ -114,6 +129,7 @@ jobs:
           command: |
             cd backend
             npm audit --audit-level=critical
+      - exit-pipeline
 
 
 workflows:
