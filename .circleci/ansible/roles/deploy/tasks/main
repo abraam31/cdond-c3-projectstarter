@@ -1,0 +1,17 @@
+---
+
+- name: Create APP Directory
+  user: ubuntu
+  become: yes
+  file:
+  	path: ~/app
+	state=directory
+
+- name: "Copy node app files"
+  become: yes
+  user: ubuntu
+  copy:
+    src: backend/dist/
+    dest: ~/backend
+
+- 

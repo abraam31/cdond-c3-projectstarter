@@ -1,0 +1,47 @@
+---
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+
+- name: "install dependencies."
+  become: yes
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
+- name: "install pm2"
+  become: yes
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+- name: "configure env vars"
+  become: yes
+  command: "{{ item }}"
+  with_items:
+    - export ENVIRONMENT=production
+    - export TYPEORM_CONNECTION=postgres
+    - export TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts
+    - export TYPEORM_HOST=$TYPEORM_HOST
+    - export TYPEORM_PORT=5532
+    - export TYPEORM_USERNAME=$TYPEORM_USERNAME
+    - export TYPEORM_PASSWORD=$TYPEORM_PASSWORD
+    - export TYPEORM_DATABASE=$TYPEORM_DATABASE
+
+- name: Start PM2
+  shell: |
+    cd /home/ubuntu/backend
+    pm2 start npm --name backend -- start
