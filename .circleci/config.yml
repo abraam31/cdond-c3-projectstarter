@@ -95,7 +95,13 @@ jobs:
       - checkout
       - restore_cache:
           key: "backend-build"
-      - run: cat backend/src/modules/domain/employees/commands/handlers/employee-activator.handler.spec.ts
+      - run: 
+        name: various commands 
+        command: |
+            cat backend/src/modules/domain/employees/commands/handlers/employee-activator.handler.spec.ts
+            ls
+            pwd
+            
       - run:
           name: Back-end test
           command: |
