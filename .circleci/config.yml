@@ -74,13 +74,14 @@ jobs:
             
             ec2_url=`cat back_url`
             
-            curl -H "Content-Type: text/plain" -H "token: 8d68a1ed-c717-40d7-8e48-e896d977404a" --request PUT --data $ec2_url https://api.memstash.io/values/back_url
-            curl -H "token: 8d68a1ed-c717-40d7-8e48-e896d977404a" --request GET https://api.memstash.io/values/back_url
+            curl -H "Content-Type: text/plain" -H "token: 9787990f-712f-4549-8efb-7715e8abab1c" --request PUT --data $ec2_url https://api.memstash.io/values/back_url
+            url=`curl -H "token: 9787990f-712f-4549-8efb-7715e8abab1c" --request GET https://api.memstash.io/values/back_url`
+            echo $url 
             
       - persist_to_workspace:
-          root: .
+          root: .circleci
           paths:
-            - .circleci/ansible/inventory.txt
+            - ansible/inventory.txt
       - attach_workspace:
             at: /tmp
 
@@ -88,8 +89,11 @@ jobs:
             name: cat host file 
             command: |
                 ls /tmp 
+                echo ####
                 ls .
+                echo ####
                 ls .circleci/ansible
+                echo ####
                 cat /tmp/inventory.txt
             
       - destroy-environment
