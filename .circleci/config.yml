@@ -36,6 +36,10 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: 
+          name: install the tar package for the workspace step 
+          command: |
+            yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -62,7 +66,17 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text >> .circleci/ansible/inventory.txt
-
+            
+            aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicDnsName \
+                --filters "Name=tag:project,Values=udapeople" \
+                --output text >> back_url
+            
+            ec2_url=`cat back_url`
+            
+            curl -H "Content-Type: text/plain" -H "token: 8d68a1ed-c717-40d7-8e48-e896d977404a" --request PUT --data $ec2_url https://api.memstash.io/values/back_url
+            curl -H "token: 8d68a1ed-c717-40d7-8e48-e896d977404a" --request GET https://api.memstash.io/values/back_url
+            
       - persist_to_workspace:
           root: .
           paths:
