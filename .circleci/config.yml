@@ -31,124 +31,55 @@ commands:
             aws cloudformation delete-stack --stack-name << parameters.frontendStack >>
 
 jobs:
-  build-frontend:
+  deploy-infrastructure:
     docker:
-      - image: circleci/node:13.8.0
+      - image: amazon/aws-cli
     steps:
       - checkout
-      - restore_cache:
-          key: "frontend-build4"
       - run:
-          name: Build front-end
+          name: Ensure back-end infrastructure exists
           command: |
-            cd frontend
-            npm install 
-            npm run build
-      - save_cache:
-          paths: 
-            - frontend/node_modules
-          key: "frontend-build4"
-      - exit-pipeline
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0-7}"
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0-7}"   
+              
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --filters "Name=tag:project,Values=udapeople" \
+                --output text >> .circleci/ansible/inventory.txt
 
-  build-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: "backend-build4"
-      - run:
-          name: Back-end build
-          command: |
-            cd backend
-            npm install
-            npm run build
-      - save_cache:
-          paths: 
-            - backend/node_modules
-          key: backend-build4
-      - exit-pipeline
+      - persist_to_workspace:
+        #  root: ~/
+          paths:
+            - .circleci/ansible/inventory.txt
+      - attach_workspace:
+            at: /tmp
 
-  test-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: "frontend-build4"
       - run:
-          name: Test front-end
-          command: |
-            cd frontend
-            npm install
-            npm run test
-      - save_cache:
-          paths: 
-            - frontend/node_modules
-          key: "frontend-build4"
-      - exit-pipeline
-          
-  test-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: "backend-build4"
-      - run: 
-            name: various commands 
+            name: cat host file 
             command: |
-                ls
-                pwd
-                ls backend 
+                ls /tmp 
+                ls .
+                ls .circleci/ansible
+                cat /tmp/inventory.txt
             
-      - run:
-          name: Back-end test
-          command: |
-            cd backend
-            npm install
-            npm run test
-      - save_cache:
-          paths: 
-            - backend/node_modules
-          key: backend-build3
-      - exit-pipeline
-            
-  scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run:
-          name: Frontend audit
-          command: |
-            cd backend
-            npm audit fix --audit-level=critical --force
-      - exit-pipeline
-
-  scan-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run:
-          name: Back-end audit
-          command: |
-            cd backend
-            npm audit fix --audit-level=critical --force
-      - exit-pipeline
-
+      - destroy-environment
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [test-backend]
-      - scan-frontend:
-          requires: [test-frontend]
+      - deploy-infrastructure
