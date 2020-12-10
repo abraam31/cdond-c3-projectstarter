@@ -16,11 +16,11 @@ commands:
     parameters:
         backendStack:
             type: string
-            default: "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}"
+            default: "udapeople-back-$WorkFlowID"
 
         frontendStack:
             type: string
-            default: "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}"
+            default: "udapeople-front-$WorkFlowID"
             
     steps:
       - run:
@@ -36,14 +36,16 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - 
       - run:
           name: Ensure back-end infrastructure exists
           command: |
+            aws --version 
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
-              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0-7}"
+              --stack-name "udapeople-back-nncnrko" \
+              --parameter-overrides ID="$WorkFlowID"
               
       - run:
           name: Ensure front-end infrastructure exist
@@ -51,8 +53,8 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udapeople \
-              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0-7}"   
+              --stack-name "udapeople-front-$WorkFlowID" \
+              --parameter-overrides ID="$WorkFlowID"   
               
       - run:
           name: Add back-end ip to ansible inventory
