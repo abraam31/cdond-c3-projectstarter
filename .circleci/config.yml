@@ -114,6 +114,6 @@ workflows:
   default:
     jobs:
       - deploy-infrastructure
-      - cat_workspace
+      - cat_workspace:
             requires:
                 - deploy-infrastructure
