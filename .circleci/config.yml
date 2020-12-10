@@ -97,7 +97,7 @@ jobs:
             yum -y install tar gzip
             
       - attach_workspace:
-            at: /tmp
+            at: .
 
       - run:
             name: cat host file 
@@ -108,7 +108,8 @@ jobs:
                 echo ####
                 ls .circleci/ansible
                 echo ####
-                cat /tmp/inventory.txt
+                cat inventory.txt
+      - destroy-environment
 
 workflows:
   default:
