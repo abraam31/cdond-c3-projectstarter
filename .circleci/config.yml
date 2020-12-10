@@ -84,14 +84,14 @@ jobs:
             - ansible/inventory.txt
             
       - attach_workspace:
-            at: .
+            at: /tmp
 
       - run:
             name: cat host file 
             command: |
-                ls .
+                ls -a /tmp 
                 echo #####
-                cat ansible/inventory.txt
+                cat /tmp/.circleci/ansible/inventory.txt
       - destroy-environment
            
 
