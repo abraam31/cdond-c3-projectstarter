@@ -82,6 +82,14 @@ jobs:
           root: .circleci
           paths:
             - ansible/inventory.txt
+            
+           
+
+  cat_workspace:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
       - attach_workspace:
             at: /tmp
 
@@ -95,10 +103,9 @@ jobs:
                 ls .circleci/ansible
                 echo ####
                 cat /tmp/inventory.txt
-            
-      - destroy-environment
 
 workflows:
   default:
     jobs:
       - deploy-infrastructure
+      - cat_workspace
