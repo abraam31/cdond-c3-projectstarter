@@ -82,7 +82,8 @@ jobs:
           root: .circleci
           paths:
             - ansible/inventory.txt
-            
+      - destroy-environment
+           
            
 
   cat_workspace:
@@ -90,6 +91,11 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: 
+          name: install the tar package for the workspace step 
+          command: |
+            yum -y install tar gzip
+            
       - attach_workspace:
             at: /tmp
 
@@ -109,3 +115,5 @@ workflows:
     jobs:
       - deploy-infrastructure
       - cat_workspace
+            requires:
+                - deploy-infrastructure
