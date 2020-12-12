@@ -28,19 +28,12 @@
     global: yes
     production: yes
     state: present
-    
-- name: "configure env vars"
-  become: yes
-  command: "{{ item }}"
-  with_items:
-    - export ENVIRONMENT=production
-    - export TYPEORM_CONNECTION=postgres
-    - export TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts
-    - export TYPEORM_HOST=$TYPEORM_HOST
-    - export TYPEORM_PORT=5532
-    - export TYPEORM_USERNAME=$TYPEORM_USERNAME
-    - export TYPEORM_PASSWORD=$TYPEORM_PASSWORD
-    - export TYPEORM_DATABASE=$TYPEORM_DATABASE
+
+- name: Basic usage
+  become: yes 
+  debug:
+      msg: "'{{ lookup('env', 'TYPEORM_CONNECTION') }}' is the HOME environment variable."
+      #msg: "'{{ lookup('env', 'HOMIE') | default('/home/abraam', True) }}' is the user."
 
 - name: Start PM2
   shell: |
