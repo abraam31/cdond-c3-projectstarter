@@ -39,25 +39,7 @@ jobs:
       - run: 
           name: install the tar package for the workspace step 
           command: |
-            yum -y install tar gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws --version 
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-back-nncnrko" \
-              --parameter-overrides ID="$WorkFlowID"
-              
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-front-$WorkFlowID" \
-              --parameter-overrides ID="$WorkFlowID"   
+            yum -y install tar gzip 
               
       - run:
           name: Add back-end ip to ansible inventory
@@ -78,6 +60,8 @@ jobs:
             url=`curl -H "token: 9787990f-712f-4549-8efb-7715e8abab1c" --request GET https://api.memstash.io/values/back_url`
             echo $url 
             
+            cat .circleci/ansible/inventory.txt
+            
       - persist_to_workspace:
           root: .circleci
           paths:
@@ -97,12 +81,12 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
+            cat .circleci/ansible/inventory.txt
             
       - run:
           name: Configure server
           command: |
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
-      - destroy-environment      
           
 
 
