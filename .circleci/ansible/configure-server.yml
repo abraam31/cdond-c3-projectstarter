@@ -12,11 +12,11 @@
     ENVIRONMENT: production
     TYPEORM_CONNECTION: postgres
     TYPEORM_ENTITIES: ./src/modules/domain/**/*.entity.ts
-    TYPEORM_HOST: 
+    TYPEORM_HOST: udapeople.cpwgmysulhar.eu-west-1.rds.amazonaws.com
     TYPEORM_PORT: 5532
-    TYPEORM_USERNAME:
-    TYPEORM_PASSWORD:
-    TYPEORM_DATABASE:
+    TYPEORM_USERNAME: postgres
+    TYPEORM_PASSWORD: udapeople
+    TYPEORM_DATABASE: udapeople
   pre_tasks:
     - name: "wait 600 seconds for target connection to become reachable/usable."
       command: sleep 600s 
