@@ -16,7 +16,7 @@
 
 - name: "install dependencies."
   become: yes
-  apt:
+  apt:  
     name: ["nodejs", "npm"]
     state: latest
     update_cache: yes
@@ -28,6 +28,7 @@
     global: yes
     production: yes
     state: present
+    
 - name: "configure env vars"
   become: yes
   command: "{{ item }}"
