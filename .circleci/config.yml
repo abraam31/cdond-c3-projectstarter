@@ -265,7 +265,9 @@ jobs:
           command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
 
   deploy-backend:
-  
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:  
       - checkout
       - add_ssh_keys:
             fingerprints: ["09:1c:5a:d9:6d:5e:87:c8:30:ca:2c:bf:fc:eb:b6:65"]
