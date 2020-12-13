@@ -316,6 +316,6 @@ workflows:
       - deploy-frontend:
             requires:
                 - run-migrations      
-      - deploy-back-end:
+      - deploy-backend:
             requires:
                 - run-migrations                 
