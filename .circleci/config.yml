@@ -62,52 +62,7 @@ jobs:
           command: |
             cd backend
             npm i
-            npm run build
-
-  test-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: "backend-build"
-      - run:
-          name: Back-end test
-          command: |
-            cd backend
-            npm i
-            npm run test
-      - save_cache:
-          paths: 
-            - backend/src/modules
-          key: backend-build
-  test-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          key: "frontend-build"
-      - run:
-          name: Test front-end
-          command: |
-            cd frontend
-            npm i
-            npm run test
-      - save_cache:
-          paths: 
-            - frontend/src/modules
-          key: "frontend-build"            
-  scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run:
-          name: Frontend audit
-          command: |
-            cd backend
-            npm audit fix --force
+            npm run build         
             
   scan-backend:
     docker:
@@ -187,6 +142,8 @@ jobs:
           name: Run migrations
           command: |
             cd backend
+            npm i
+            npm audit fix --force            
             npm run migrations > migration
         
       - run:
