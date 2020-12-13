@@ -64,6 +64,48 @@ jobs:
             npm i
             npm run build
 
+  test-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "backend-build"
+      - run:
+          name: Back-end test
+          command: |
+            cd backend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - backend/src/modules
+          key: backend-build
+            
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Frontend audit
+          command: |
+            cd backend
+            npm audit --audit-level=critical
+            npm audit fix --force
+            
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Back-end audit
+          command: |
+            cd backend
+            npm audit --audit-level=critical
+            npm audit fix --force
+            
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -131,8 +173,6 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm i
-            npm audit fix 
             npm run migrations > migration
         
       - run:
@@ -206,10 +246,22 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
+      - test-frontend:
+            requires:
+                - build-frontend
+      - test-backend:
+            requires:
+                - build-backend      
+      - scan-frontend:
+            requires:
+                - test-frontend
+      - scan-backend:
+            requires:
+                - test-backend  
                 
       - deploy-infrastructure:
             requires:
-                - build-frontend
+                - scan-frontend
       - configure-infrastructure:
             requires:
                 - deploy-infrastructure
