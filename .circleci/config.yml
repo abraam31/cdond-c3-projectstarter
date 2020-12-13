@@ -142,6 +142,14 @@ jobs:
           name: Run migrations
           command: |
             cd backend
+            export ENVIRONMENT="production"
+            TYPEORM_CONNECTION="postgres"
+            TYPEORM_ENTITIES="./src/modules/domain/**/*.entity.ts"
+            TYPEORM_HOST="udapeople.cpwgmysulhar.eu-west-1.rds.amazonaws.com"
+            TYPEORM_PORT=5532
+            TYPEORM_USERNAME="postgres"
+            TYPEORM_PASSWORD="udapeople"
+            TYPEORM_DATABASE="udapeople"
             sudo npm install
             sudo npm start 
             sudo npm run premigrations           
