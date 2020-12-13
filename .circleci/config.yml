@@ -31,6 +31,109 @@ commands:
             aws cloudformation delete-stack --stack-name << parameters.frontendStack >>
 
 jobs:
+  build-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "frontend-build"
+      - run:
+          name: Build front-end
+          command: |
+            cd frontend
+            npm i
+            npm run build
+      - save_cache:
+          paths: 
+            - frontend/src/modules
+          key: "frontend-build"
+      - exit-pipeline
+
+  build-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "backend-build"
+      - run:
+          name: Back-end build
+          command: |
+            cd backend
+            npm i
+            npm run build
+
+  test-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "frontend-build"
+      - run:
+          name: Test front-end
+          command: |
+            cd frontend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - frontend/src/modules
+          key: "frontend-build"
+      - exit-pipeline
+          
+  test-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "backend-build"
+      - run: cat backend/src/modules/domain/employees/commands/handlers/employee-activator.handler.spec.ts
+      - run:
+          name: Back-end test
+          command: |
+            cd backend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - backend/src/modules
+          key: backend-build
+      - exit-pipeline
+            
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Frontend audit
+          command: |
+            cd backend
+            npm audit --audit-level=critical
+      - exit-pipeline
+
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Back-end audit
+          command: |
+            cd backend
+            npm audit --audit-level=critical
+      - exit-pipeline
+
+
+      - save_cache:
+          paths: 
+            - backend/src/modules
+          key: backend-build
+      - exit-pipeline
+      
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -39,7 +142,25 @@ jobs:
       - run: 
           name: install the tar package for the workspace step 
           command: |
-            yum -y install tar gzip 
+            yum -y install tar gzip
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws --version 
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-back-$WorkFlowID" \
+              --parameter-overrides ID="abraam-project3"
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-front-$WorkFlowID" \
+              --parameter-overrides ID="abraam-project3"   
               
       - run:
           name: Add back-end ip to ansible inventory
@@ -60,14 +181,12 @@ jobs:
             url=`curl -H "token: 9787990f-712f-4549-8efb-7715e8abab1c" --request GET https://api.memstash.io/values/back_url`
             echo $url 
             
-            cat .circleci/ansible/inventory.txt
-            
       - persist_to_workspace:
           root: .circleci
           paths:
             - ansible/inventory.txt
       - destroy-environment
-           
+                
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11
@@ -90,13 +209,111 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
-          
 
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm i
+            npm run migrations > migration
+        
+      - run:
+          name: Send migration results to memstash
+          command: |
+            #!/bin/bash
+            cat migration | grep "has been executed successfully"
+            last=`echo $?`
+            if [[ $last -eq 0 ]]; then 
+                curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "migration" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+            else
+                exit 1
+            fi
 
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            npm i
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=`aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --filters "Name=tag:project,Values=udapeople" \
+                --output text`
+            export API_URL="https://${BACKEND_IP}:3000"
+            echo "${API_URL}"
+            
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm i
+            npm run build
+            
+      - run:
+          name: copy files to s3
+          command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
+
+  deploy-backend:
+  
+      - checkout
+      - add_ssh_keys:
+            fingerprints: ["09:1c:5a:d9:6d:5e:87:c8:30:ca:2c:bf:fc:eb:b6:65"]
+
+      - attach_workspace:
+        at: /tmp
+        
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+
+      - run:
+          name: Deploy backend
+          command: |
+            ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+            
+      - destroy-environment 
+
+      
 workflows:
   default:
     jobs:
-      - deploy-infrastructure
+      - build-backend
+      - build-frontend
+      - test-backend:
+            requires:
+                - build-backend
+      - test-frontend:
+            requires:
+                - test-frontend
+      - scan-backend:
+            requires:
+                - test-backend
+      - scan-frontend:
+            requires:
+                - test-frontend
+                
+      - deploy-infrastructure:
       - configure-infrastructure:
             requires:
                 - deploy-infrastructure
+      - run-migrations:
+            requires:
+                - configure-infrastructure
+      - deploy-frontend:
+            requires:
+                - run-migrations      
+      - deploy-back-end:
+            requires:
+                - run-migrations                 

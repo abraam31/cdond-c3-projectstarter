@@ -33,9 +33,4 @@
   become: yes 
   debug:
       msg: "'{{ lookup('env', 'TYPEORM_CONNECTION') }}' is the HOME environment variable."
-      #msg: "'{{ lookup('env', 'HOMIE') | default('/home/abraam', True) }}' is the user."
-
-- name: Start PM2
-  shell: |
-    cd /home/ubuntu/backend
-    pm2 start npm --name backend -- start
+      #msg: "'{{ lookup('env', 'HOMIE') | default('/home/abraam', True) }}' is the user."   
