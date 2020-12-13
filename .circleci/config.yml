@@ -144,6 +144,7 @@ jobs:
             cd backend
             sudo npm install -g npm
             sudo npm update
+            sudo npm audit fix 
             sudo npm run build
             sudo npm run migrations > migration
         
