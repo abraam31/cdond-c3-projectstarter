@@ -142,9 +142,9 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install -g npm
-            npm update
-            npm run migrations > migration
+            sudo npm install -g npm
+            sudo npm update
+            sudo npm run migrations > migration
         
       - run:
           name: Send migration results to memstash
