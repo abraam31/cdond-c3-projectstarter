@@ -141,8 +141,8 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            sudo npm install -g npm
-            sudo npm update
+            sudo cd backend
+            sudo npm run premigrations           
             sudo npm run migrations > migration
         
       - run:
