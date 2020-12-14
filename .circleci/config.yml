@@ -70,7 +70,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build1"
+          key: "backend-build"
+      - run: cat backend/src/modules/domain/employees/commands/handlers/employee-activator.handler.spec.ts
       - run:
           name: Back-end test
           command: |
@@ -80,26 +81,22 @@ jobs:
       - save_cache:
           paths: 
             - backend/src/modules
-          key: backend-build1
-
-  test-frontend:
+          key: backend-build
+      - exit-pipeline
+            
+  scan-frontend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          key: "frontend-build1"
       - run:
-          name: Test front-end
+          name: Frontend audit
           command: |
-            cd frontend
-            npm i
-            npm run test
-      - save_cache:
-          paths: 
-            - frontend/src/modules
-          key: "frontend-build1"
-          
+            cd backend
+            npm audit --audit-level=critical
+            npm audit fix
+      - exit-pipeline
+
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -109,18 +106,9 @@ jobs:
           name: Back-end audit
           command: |
             cd backend
-            npm audit fix --force
-
-  scan-frontend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - run:
-          name: Front-end audit
-          command: |
-            cd frontend
-            npm audit fix --force
+            npm audit --audit-level=critical
+            npm audit fix 
+      - exit-pipeline
             
   deploy-infrastructure:
     docker:
@@ -131,23 +119,7 @@ jobs:
           name: install the tar package for the workspace step 
           command: |
             yum -y install tar gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-back-abraam-project3" \
-              --parameter-overrides ID="abraam-project3"
-              
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-front-abraam-project3" \
-              --parameter-overrides ID="abraam-project3"                 
+                 
       - run:
           name: Add back-end ip to ansible inventory
           command: |
