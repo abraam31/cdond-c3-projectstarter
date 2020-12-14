@@ -64,6 +64,25 @@ jobs:
             npm i
             npm run build         
 
+  test-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "frontend-build"
+      - run:
+          name: Test front-end
+          command: |
+            cd frontend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - frontend/src/modules
+          key: "frontend-build"
+      - exit-pipeline
+      
   test-backend:
     docker:
       - image: circleci/node:13.8.0
