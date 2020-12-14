@@ -84,7 +84,23 @@ jobs:
           name: install the tar package for the workspace step 
           command: |
             yum -y install tar gzip
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-back-abraam-project3" \
+              --parameter-overrides ID="abraam-project3"
               
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-front-abraam-project3" \
+              --parameter-overrides ID="abraam-project3"                 
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -143,13 +159,13 @@ jobs:
           command: |
             cd backend
             export ENVIRONMENT="production"
-            TYPEORM_CONNECTION="postgres"
-            TYPEORM_ENTITIES="./src/modules/domain/**/*.entity.ts"
-            TYPEORM_HOST="udapeople.cpwgmysulhar.eu-west-1.rds.amazonaws.com"
-            TYPEORM_PORT=5532
-            TYPEORM_USERNAME="postgres"
-            TYPEORM_PASSWORD="udapeople"
-            TYPEORM_DATABASE="udapeople"
+            export TYPEORM_CONNECTION="postgres"
+            export TYPEORM_ENTITIES="./src/modules/domain/**/*.entity.ts"
+            export TYPEORM_HOST="udapeople.cpwgmysulhar.eu-west-1.rds.amazonaws.com"
+            export TYPEORM_PORT=5532
+            export TYPEORM_USERNAME="postgres"
+            export TYPEORM_PASSWORD="udapeople"
+            export TYPEORM_DATABASE="udapeople"
             sudo npm install
             sudo npm start 
             sudo npm run premigrations           
