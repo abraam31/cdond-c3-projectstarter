@@ -37,7 +37,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build"
+          key: "frontend-build1"
       - run:
           name: Build front-end
           command: |
@@ -47,7 +47,7 @@ jobs:
       - save_cache:
           paths: 
             - frontend/src/modules
-          key: "frontend-build"
+          key: "frontend-build1"
       - exit-pipeline
 
   build-backend:
@@ -56,14 +56,50 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "backend-build"
+          key: "backend-build1"
       - run:
           name: Back-end build
           command: |
             cd backend
             npm i
             npm run build         
-            
+
+  test-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "backend-build1"
+      - run:
+          name: Back-end test
+          command: |
+            cd backend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - backend/src/modules
+          key: backend-build1
+
+  test-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: "frontend-build1"
+      - run:
+          name: Test front-end
+          command: |
+            cd frontend
+            npm i
+            npm run test
+      - save_cache:
+          paths: 
+            - frontend/src/modules
+          key: "frontend-build1"
+          
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -73,6 +109,17 @@ jobs:
           name: Back-end audit
           command: |
             cd backend
+            npm audit fix --force
+
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Front-end audit
+          command: |
+            cd frontend
             npm audit fix --force
             
   deploy-infrastructure:
@@ -154,6 +201,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          key: "frontend-build1"
       - run:
           name: Run migrations
           command: |
@@ -242,9 +291,18 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
+      - test-backend:
+            requires:
+                - build-backend  
+      - test-frontend:
+            requires:
+                - build-frontend 
       - scan-backend:
             requires:
-                - build-backend   
+                - test-backend   
+      - scan-frontend:
+            requires:
+                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - scan-backend
