@@ -314,8 +314,8 @@ workflows:
 
       - deploy-infrastructure:
             requires:
-                - scan-backend
-      - configure-infrastructure:build-backend
+                - build-backend
+      - configure-infrastructure:
             requires:
                 - deploy-infrastructure
       - run-migrations:
