@@ -33,7 +33,7 @@ commands:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node
     steps:
       - checkout
       - restore_cache:
@@ -43,6 +43,7 @@ jobs:
           command: |
             cd frontend
             npm i
+            npm install oauth-sign --save
             npm run build
       - save_cache:
           paths: 
@@ -52,7 +53,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node
     steps:
       - checkout
       - restore_cache:
@@ -66,7 +67,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node
     steps:
       - checkout
       - restore_cache:
@@ -85,7 +86,7 @@ jobs:
       
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node
     steps:
       - checkout
       - restore_cache:
