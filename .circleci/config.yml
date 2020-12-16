@@ -37,7 +37,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "abraam-front1"
+          key: "abraam-front2"
       - run:
           name: Build front-end
           command: |
@@ -62,7 +62,7 @@ jobs:
       - save_cache:
           paths: 
             - frontend/src/node
-          key: "abraam-front1"
+          key: "abraam-front2"
       - exit-pipeline
 
   build-backend:
@@ -86,7 +86,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "abraam-front1"
+          key: "abraam-front2"
       - run:
           name: Test front-end
           command: |
@@ -107,7 +107,7 @@ jobs:
       - save_cache:
           paths: 
             - frontend//node_modules
-          key: "abraam-front1"
+          key: "abraam-front2"
       - exit-pipeline
       
   test-backend:
