@@ -37,18 +37,29 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build1"
+          key: "abraam-front"
       - run:
           name: Build front-end
           command: |
+            ls -a
+            echo #######
+            ls frontend -a
+            echo ###########
+            ls 
             cd frontend
-            npm i
-            npm install oauth-sign --save
-            npm run build
+            echo ##################
+            ls -a 
+            ls src -a
+            sudo npm i
+            sudo npm install oauth-sign --save
+            sudo npm run build
+            ls -a 
+            ls -a src 
+            ls -a ..
       - save_cache:
           paths: 
-            - frontend/src/modules
-          key: "frontend-build1"
+            - frontend/src
+          key: "abraam-front"
       - exit-pipeline
 
   build-backend:
@@ -63,6 +74,7 @@ jobs:
           command: |
             cd backend
             npm i
+
             npm run build         
 
   test-frontend:
@@ -71,17 +83,21 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: "frontend-build"
+          key: "abraam-front"
       - run:
           name: Test front-end
           command: |
             cd frontend
-            npm i
-            npm run test
+            sudo npm i
+            sudo npm run test
+            sudo npm install oauth-sign --save
+            ls -a 
+            ls -a src 
+            ls -a ..
       - save_cache:
           paths: 
-            - frontend/src/modules
-          key: "frontend-build"
+            - frontend/src
+          key: "abraam-front"
       - exit-pipeline
       
   test-backend:
@@ -197,14 +213,16 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            export ENVIRONMENT="production"
-            export TYPEORM_CONNECTION="postgres"
-            export TYPEORM_ENTITIES="./src/modules/domain/**/*.entity.ts"
-            export TYPEORM_HOST="udapeople.cpwgmysulhar.eu-west-1.rds.amazonaws.com"
-            export TYPEORM_PORT=5532
-            export TYPEORM_USERNAME="postgres"
-            export TYPEORM_PASSWORD="udapeople"
-            export TYPEORM_DATABASE="udapeople"
+            touch .env
+            echo -e ENVIRONMENT="production" >> .env
+            echo -e TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> .env
+            echo -e TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> .env
+            echo -e TYPEORM_HOST=$TYPEORM_HOST >> .env
+            echo -e TYPEORM_PORT=$TYPEORM_PORT >> .env
+            echo -e TYPEORM_USERNAME=$TYPEORM_USERNAME >> .env
+            echo -e TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
+            echo -e TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
+            echo -e VERSION=1 >> .env
             sudo npm install
             sudo npm start 
             sudo npm run premigrations           
