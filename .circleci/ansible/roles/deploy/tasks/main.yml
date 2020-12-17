@@ -10,7 +10,7 @@
 - name: "Copy node app files"
   become: yes
   become_user: ubuntu
-  copy:
+  synchronize:
     src: ~/project/backend/dist/
     dest: ~/backend
 
