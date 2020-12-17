@@ -41,24 +41,9 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            ls -a
-            echo #######
-            ls frontend -a
-            echo ###########
-            ls 
-            cd frontend
-            echo ##################
-            ls -a 
-            ls src -a
             sudo npm i
             sudo npm install oauth-sign --save
             sudo npm run build
-            echo ######## frontend 
-            ls -a 
-            echo ########### src content
-            ls -a src 
-            echo ########### root content 
-            ls -a ..
       - save_cache:
           paths: 
             - frontend/src/node
@@ -77,9 +62,11 @@ jobs:
           command: |
             cd backend
             npm i
-
             npm run build         
-
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend/dist/*
   test-frontend:
     docker:
       - image: circleci/node
@@ -90,20 +77,10 @@ jobs:
       - run:
           name: Test front-end
           command: |
-            echo ######## root  
-            ls -a 
-            echo ########### src content
-            ls -a frontend 
             cd frontend
             sudo npm i
             sudo npm run test
             sudo npm install oauth-sign --save
-            echo ######## frontend 
-            ls -a 
-            echo ########### src content
-            ls -a src 
-            echo ########### root content 
-            ls -a ..
       - save_cache:
           paths: 
             - frontend//node_modules
@@ -291,17 +268,19 @@ jobs:
             fingerprints: ["09:1c:5a:d9:6d:5e:87:c8:30:ca:2c:bf:fc:eb:b6:65"]
 
       - attach_workspace:
-            at: /tmp
+            at: .
         
       - run:
           name: Install dependencies
           command: |
+            ls 
+            ls backend 
             apk add --update ansible
 
       - run:
           name: Deploy backend
           command: |
-            ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+            ansible-playbook -i backend/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
             
       
 workflows:
