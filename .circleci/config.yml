@@ -236,7 +236,9 @@ jobs:
             echo -e TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
             echo -e TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
             echo -e VERSION=1 >> .env
+            sudo cd backend 
             sudo npm install     
+            sudo npm run build
             sudo npm run migrations > migration
         
       - run:
