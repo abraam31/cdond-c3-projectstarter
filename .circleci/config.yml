@@ -274,6 +274,8 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
+            apk add openssh-client
+
 
       - run:
           name: Deploy backend
