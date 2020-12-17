@@ -255,11 +255,11 @@ jobs:
             cd frontend
             npm i
             npm run build
-            ls frontend/dist
+            ls dist
             
       - run:
           name: copy files to s3
-          command: aws s3 cp frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0-7}/ --recursive
+          command: aws s3 cp frontend/dist s3://udapeople-1ecc10f/ --recursive
 
   deploy-backend:
     docker:
