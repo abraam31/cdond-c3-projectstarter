@@ -310,13 +310,14 @@ jobs:
           name: Get backend url
           command: |
             #!/bin/bash
-            export API_URL=`cat API_URL`
+            export API_URL="`cat API_URL`/api/status"            
             echo "${API_URL}"      
             
       - run:      
           name: Backend smoke test.
           command: |
             #/bin/bash
+            echo "${API_URL}"                  
             curl -I $API_URL
             if [[ $? -ne 0 ]]; then
                 echo "api is not reachable"
