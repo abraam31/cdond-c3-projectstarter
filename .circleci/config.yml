@@ -163,25 +163,6 @@ jobs:
           name: install the tar package for the workspace step 
           command: |
             yum -y install tar gzip
-
-
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="abraam-project3"
-              
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="abraam-project3"   
               
       - run:
           name: Add back-end ip to ansible inventory
@@ -331,18 +312,6 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
-      - test-backend:
-            requires:
-                - build-backend  
-      - test-frontend:
-            requires:
-                - build-frontend 		  
-      - scan-backend:
-            requires:
-                - test-backend   
-      - scan-frontend:
-            requires:
-                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - build-backend
