@@ -298,21 +298,17 @@ jobs:
       - image: alpine
     steps:
       - checkout
+      - attach_workspace:
+            at: .             
       - run:
           name: Install dependencies
           command: |
             apk add --update tar 
             apk add --update gzip 
-            
-      - attach_workspace:
-            at: .            
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=`aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:project,Values=udapeople" \
-                --output text`
+            #!/bin/bash
             export API_URL=`cat API_URL`
             echo "${API_URL}"      
             
@@ -340,8 +336,9 @@ jobs:
 workflows:
   default:
     jobs:
-      - deploy-infrastructure:
+      - deploy-frontend
+      - smoke-test:
             requires:
-                - build-backend
+                - deploy-frontend
 
                 
