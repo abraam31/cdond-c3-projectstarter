@@ -11,7 +11,7 @@
   become: yes
   become_user: ubuntu
   ignore_errors: True
-  synchronize:
+  copy:
     src: ~/project/backend/dist/
     dest: ~/backend
 
