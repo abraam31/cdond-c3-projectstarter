@@ -246,13 +246,12 @@ jobs:
           name: Send migration results to memstash
           command: |
             #!/bin/bash
+            cat migration
             cd backend
             cat migration | grep "has been executed successfully"
             last=`echo $?`
             if [[ $last -eq 0 ]]; then 
-                curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "migration" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-            #else
-             #   exit 1
+                curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "migration" https://api.memstash.io/values/migration_$CIRCLE_WORKFLOW_ID
             fi
 
   deploy-frontend:
