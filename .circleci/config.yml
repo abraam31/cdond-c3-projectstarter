@@ -275,6 +275,8 @@ jobs:
           command: |
             ls 
             ls backend 
+            echo #####
+            ls backend/dist
             apk add --update ansible
 
       - run:
