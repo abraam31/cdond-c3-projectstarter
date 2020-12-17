@@ -255,10 +255,11 @@ jobs:
             cd frontend
             npm i
             npm run build
+            ls frontend/dist
             
       - run:
           name: copy files to s3
-          command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
+          command: aws s3 cp frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0-7}/ --recursive
 
   deploy-backend:
     docker:
@@ -275,8 +276,13 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
-            apk add --update rsync
+            apk add --update tar
+            apk add --update gzip
 
+      - run:
+          name: compressing
+          command: |
+            tar cvf artifacts.tar backend/dist/
 
       - run:
           name: Deploy backend
