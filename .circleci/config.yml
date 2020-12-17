@@ -245,6 +245,7 @@ jobs:
           name: Send migration results to memstash
           command: |
             #!/bin/bash
+            cd backend
             cat migration | grep "has been executed successfully"
             last=`echo $?`
             if [[ $last -eq 0 ]]; then 
