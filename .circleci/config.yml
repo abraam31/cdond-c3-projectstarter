@@ -258,7 +258,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            npm i
+            apt-get install npm
       - run:
           name: Get backend url
           command: |
@@ -307,17 +307,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-backend
-      - build-frontend
-      - deploy-infrastructure:
-            requires:
-                - build-backend
-      - configure-infrastructure:
-            requires:
-                - deploy-infrastructure
-      - run-migrations:
-            requires:
-                - configure-infrastructure
+
       - deploy-frontend:
             requires:
                 - run-migrations      
