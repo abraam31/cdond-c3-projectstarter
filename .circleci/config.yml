@@ -259,7 +259,7 @@ jobs:
           name: Install dependencies
           command: |
             yum install -y gcc-c++ make
-            curl -sL https://rpm.nodesource.com/setup_6.x | sudo -E bash -
+            curl -sL https://rpm.nodesource.com/setup_6.x 
             yum install nodejs
       - run:
           name: Get backend url
@@ -301,16 +301,16 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:project,Values=udapeople" \
-                --output text >> /tmp/ansible/inventory.txt
             ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
             
       
 workflows:
   default:
     jobs:
-
-      - deploy-frontend
-      - deploy-backend         
+      - deploy-infrastructure   
+      - deploy-frontend:
+            requires:
+                - deploy-infrastructure   
+      - deploy-backend:
+            requires:
+                - deploy-infrastructure    
