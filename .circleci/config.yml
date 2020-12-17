@@ -248,12 +248,7 @@ jobs:
             #!/bin/bash
             cd backend
             cat migration
-            cat migration | grep "has been executed successfully"
             curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "migration" https://api.memstash.io/values/migration_$CIRCLE_WORKFLOW_ID
-            last=`echo $?`
-            if [[ $last -eq 0 ]]; then 
-                echo done
-            fi
 
   deploy-frontend:
     docker:
