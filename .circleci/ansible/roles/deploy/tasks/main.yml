@@ -12,18 +12,11 @@
   ignore_errors: True
   unarchive:
     src: ~/project/artifacts.tar
-    dest: ~/backend
-
-- name: "unarchive"
-  become: yes
-  ignore_errors: True
-  copy:
-    src: ~/project/artifacts.tar
-    dest: ~/backend
+    dest: ~/app
     
 - name: Start PM2
   become_user: ubuntu
   become: yes
   shell: |
-    cd /home/ubuntu/backend
+    cd /home/ubuntu/app
     pm2 start npm --name backend -- start 
