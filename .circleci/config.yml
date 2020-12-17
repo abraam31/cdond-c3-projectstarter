@@ -33,7 +33,7 @@ commands:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -52,7 +52,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -69,7 +69,7 @@ jobs:
             - backend/dist/*
   test-frontend:
     docker:
-      - image: circleci/node
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -89,7 +89,7 @@ jobs:
       
   test-backend:
     docker:
-      - image: circleci/node
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -329,7 +329,7 @@ jobs:
           command: |
             #!/bin/bash
             export API_URL="`cat /tmp/API_URL`/api/status"            
-            echo "${API_URL}" > API_URL     
+            echo "${API_URL} " > API_URL     
             
       - run:      
           name: Backend smoke test.
@@ -358,9 +358,22 @@ jobs:
 workflows:
   default:
     jobs:
-      - deploy-frontend
-      - smoke-test:
+      - build-backend
+      - build-frontend
+      - deploy-infrastructure:
             requires:
-                - deploy-frontend
+                - build-backend
+      - configure-infrastructure:
+            requires:
+                - deploy-infrastructure
+      - run-migrations:
+            requires:
+                - configure-infrastructure
+      - deploy-frontend:
+            requires:
+                - run-migrations      
+      - deploy-backend:
+            requires:
+                - run-migrations  
 
                 
