@@ -273,10 +273,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            ls 
-            ls backend 
-            echo #####
-            ls backend/dist
+            apk add openssh-client
             apk add --update ansible
 
       - run:
