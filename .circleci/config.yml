@@ -306,6 +306,7 @@ jobs:
           command: |
             apk add --update tar 
             apk add --update gzip 
+            apk add --update curl
       - run:
           name: Get backend url
           command: |
