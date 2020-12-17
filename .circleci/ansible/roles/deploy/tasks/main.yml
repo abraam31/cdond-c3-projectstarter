@@ -4,8 +4,8 @@
   user: ubuntu
   become: yes
   file:
-  	path: ~/app
-	state=directory
+    path: ~/app
+    state: directory
 
 - name: "Copy node app files"
   become: yes
