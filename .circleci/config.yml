@@ -247,7 +247,7 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text`
-            export API_URL="https://${BACKEND_IP}:3000"
+            export API_URL="https://${BACKEND_IP}:3030"
             echo ${API_URL} > API_URL 
       - persist_to_workspace:
           root: .
@@ -256,6 +256,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
+            export API_URL=`cat API_URL`
             cd frontend
             npm i
             npm run build
