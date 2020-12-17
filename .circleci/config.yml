@@ -225,18 +225,18 @@ jobs:
           command: |
             cd backend
             touch .env
-            echo -e ENVIRONMENT="production" >> .env
-            echo -e TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> .env
-            echo -e TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> .env
-            echo -e TYPEORM_HOST=$TYPEORM_HOST >> .env
-            echo -e TYPEORM_PORT=$TYPEORM_PORT >> .env
-            echo -e TYPEORM_USERNAME=$TYPEORM_USERNAME >> .env
-            echo -e TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> .env 
-            echo -e TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> .env
-            echo -e TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
-            echo -e TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
+            echo -e "ENVIRONMENT=production" >> .env
+            echo -e "TYPEORM_CONNECTION=$TYPEORM_CONNECTION" >> .env
+            echo -e "TYPEORM_ENTITIES=$TYPEORM_ENTITIES" >> .env
+            echo -e "NODE_ENV=production" >> .env
+            echo -e "TYPEORM_HOST=$TYPEORM_HOST" >> .env
+            echo -e "TYPEORM_PORT=$TYPEORM_PORT" >> .env
+            echo -e "TYPEORM_USERNAME=$TYPEORM_USERNAME" >> .env
+            echo -e "TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR" >> .env 
+            echo -e "TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS" >> .env
+            echo -e "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" >> .env
+            echo -e "TYPEORM_DATABASE=$TYPEORM_DATABASE" >> .env
             echo -e VERSION=1 >> .env
-            cd backend 
             sudo npm install     
             sudo npm run build
             sudo npm run migrations > migration
