@@ -8,6 +8,7 @@
     state: directory
 
 - name: "Copy node app files"
+  become_user: ubuntu
   become: yes
   ignore_errors: True
   unarchive:
