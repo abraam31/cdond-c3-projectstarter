@@ -164,6 +164,24 @@ jobs:
           command: |
             yum -y install tar gzip
 
+
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="abraam-project3"
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="abraam-project3"   
               
       - run:
           name: Add back-end ip to ansible inventory
@@ -232,6 +250,8 @@ jobs:
             echo -e TYPEORM_HOST=$TYPEORM_HOST >> .env
             echo -e TYPEORM_PORT=$TYPEORM_PORT >> .env
             echo -e TYPEORM_USERNAME=$TYPEORM_USERNAME >> .env
+            echo -e TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> .env 
+            echo -e TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> .env
             echo -e TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
             echo -e TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
             echo -e VERSION=1 >> .env
@@ -311,7 +331,18 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
-
+      - test-backend:
+            requires:
+                - build-backend  
+      - test-frontend:
+            requires:
+                - build-frontend 		  
+      - scan-backend:
+            requires:
+                - test-backend   
+      - scan-frontend:
+            requires:
+                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - build-backend
@@ -326,4 +357,4 @@ workflows:
                 - run-migrations      
       - deploy-backend:
             requires:
-                - run-migrations                 
+                - run-migrations            
