@@ -11,8 +11,6 @@
   become: yes
   become_user: ubuntu
   ignore_errors: True
-  async: 60
-  poll: 60
   synchronize:
     src: ~/project/backend/dist/
     dest: ~/backend
