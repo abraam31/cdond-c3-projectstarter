@@ -312,7 +312,7 @@ jobs:
             export API_URL=`cat API_URL`
             echo "${API_URL}"      
             
-          name: Backend smoke test.
+      -   name: Backend smoke test.
           command: |
             #/bin/bash
             curl -I $API_URL
