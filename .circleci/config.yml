@@ -41,6 +41,7 @@ jobs:
       - run:
           name: Build front-end
           command: |
+            cd frontend
             npm i
             npm run build
       - save_cache:
@@ -114,7 +115,7 @@ jobs:
       - run:
           name: Frontend audit
           command: |
-            cd backend
+            cd frontend
             npm audit fix
       - exit-pipeline
 
