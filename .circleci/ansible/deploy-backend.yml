@@ -16,9 +16,13 @@
       apt:
         name: python
         state: present
-    - name: "install rsync for Ansible."
+    - name: "install tar for Ansible."
       apt:
-        name: rsync
-        state: present       
+        name: tar
+        state: present  
+    - name: "install gzip for Ansible."
+      apt:
+        name: gzip
+        state: present         
   roles:
     - deploy
