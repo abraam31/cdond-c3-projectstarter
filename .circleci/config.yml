@@ -247,8 +247,11 @@ jobs:
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text`
             export API_URL="https://${BACKEND_IP}:3000"
-            echo "${API_URL}"
-            
+            echo ${API_URL} > API_URL 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - API_URL         
       - run:
           name: Deploy frontend objects
           command: |
@@ -289,18 +292,56 @@ jobs:
           command: |
             ansible-playbook -vvv -i ansible/inventory.txt .circleci/ansible/deploy-backend.yml
             
-      
+
+  smoke-test:
+    docker:
+      - image: alpine
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar 
+            apk add --update gzip 
+            
+      - attach_workspace:
+            at: .            
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=`aws ec2 describe-instances \
+                --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                --filters "Name=tag:project,Values=udapeople" \
+                --output text`
+            export API_URL=`cat API_URL`
+            echo "${API_URL}"      
+            
+          name: Backend smoke test.
+          command: |
+            #/bin/bash
+            curl -I $API_URL
+            if [[ $? -ne 0 ]]; then
+                echo "api is not reachable"
+                exit 1        
+            
+      - run:
+          name: Frontend smoke test.
+          command: |
+            #!/bin/bash
+            FRONT_URL="http://udapeople-1ecc10f.s3-website-us-east-1.amazonaws.com"
+            #/bin/bash
+            curl -I $URL
+            if curl -s ${URL} | grep "Welcome"; then
+                exit 1
+            else
+                exit 0
+            fi                 
+
 workflows:
   default:
     jobs:
-      - build-backend            
       - deploy-infrastructure:
             requires:
                 - build-backend
-      - deploy-frontend:
-            requires:
-                - deploy-infrastructure      
-      - deploy-backend:
-            requires:
-                - deploy-infrastructure 
+
                 
