@@ -317,7 +317,7 @@ workflows:
                 - test-backend
       - scan-frontend:
             requires:
-                - scan-frontend                   
+                - test-frontend                   
       - deploy-infrastructure:
             requires:
                 - build-backend
@@ -334,13 +334,3 @@ workflows:
             requires:
                 - run-migrations  
                 
-      - build-backend
-      - deploy-infrastructure:
-            requires:
-                - build-backend 
-      - deploy-frontend:
-            requires:
-                - deploy-infrastructure   
-      - deploy-backend:
-            requires:
-                - deploy-infrastructure    
