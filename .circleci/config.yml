@@ -140,7 +140,25 @@ jobs:
           name: install the tar package for the workspace step 
           command: |
             yum -y install tar gzip
-            
+
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="abraam-project3"
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --parameter-overrides ID="abraam-project3" 
+              
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -263,7 +281,7 @@ jobs:
             
       - run:
           name: copy files to s3
-          command: aws s3 cp frontend/dist s3://udapeople-1ecc10f/ --recursive
+          command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
 
   deploy-backend:
     docker:
@@ -286,7 +304,8 @@ jobs:
       - run:
           name: compressing
           command: |
-            tar cvf artifacts.tar backend/dist/
+            cd backend 
+            tar cvf artifacts.tar dist/
 
       - run:
           name: Deploy backend
@@ -343,14 +362,33 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
+      - test-backend:
+            requires:
+                - build-backend  
+      - test-frontend:
+            requires:
+                - build-frontend 		  
+      - scan-backend:
+            requires:
+                - test-backend   
+      - scan-frontend:
+            requires:
+                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - build-backend
-      - deploy-frontend:
-            requires:
-                - deploy-infrastructure     
-      - deploy-backend:
+      - configure-infrastructure:
             requires:
                 - deploy-infrastructure
-
-                
+      - run-migrations:
+            requires:
+                - configure-infrastructure
+      - deploy-frontend:
+            requires:
+                - run-migrations      
+      - deploy-backend:
+            requires:
+                - deploy-frontend 
+      - smoke-test:
+            requires:
+                - deploy-backend

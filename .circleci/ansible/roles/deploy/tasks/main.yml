@@ -19,5 +19,5 @@
   become_user: ubuntu
   become: yes
   shell: |
-    cd /home/ubuntu/app
+    cd /home/ubuntu/app/dist
     pm2 start npm --name backend -- start 
