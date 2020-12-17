@@ -281,7 +281,7 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            ansible-playbook -v -i ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+            ansible-playbook -vvv -i ansible/inventory.txt .circleci/ansible/deploy-backend.yml
             
       
 workflows:
