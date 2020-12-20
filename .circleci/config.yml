@@ -425,7 +425,23 @@ jobs:
 workflows:
   default:
     jobs:
-      - deploy-frontend
-      - smoke-test:
+      - build-backend
+      - build-frontend
+      - deploy-infrastructure:
+            requires:
+                - build-backend
+      - configure-infrastructure:
+            requires:
+                - deploy-infrastructure
+      - run-migrations:
+            requires:
+                - configure-infrastructure
+      - deploy-frontend:
+            requires:
+                - run-migrations   
+      - deploy-backend:
             requires:
                 - deploy-frontend
+      - smoke-test:
+            requires:
+                - deploy-backend
