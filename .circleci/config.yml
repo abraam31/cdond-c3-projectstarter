@@ -290,8 +290,10 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text`
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo ${API_URL} > API_URL
+            export API_URL="http://$BACKEND_IP:3030"
+            echo $API_URL > API_URL
+            echo "---------------------"
+            ls -l 
             
       - persist_to_workspace:
           root: .
@@ -300,6 +302,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
+            ls 
             export API_URL=`cat API_URL`
             cd frontend
             npm i
@@ -372,6 +375,7 @@ jobs:
       
     steps:
       - checkout
+      
       - attach_workspace:
             at: /tmp            
       - run:
@@ -417,8 +421,6 @@ jobs:
             else
                 exit 0
             fi                 
-      - destroy-environment
-      - revert-migrations
 
   cloudfront-update:
     docker:
@@ -433,8 +435,7 @@ jobs:
               --tags project=udapeople \
               --stack-name "abraam-cdn" \
               --parameter-overrides WorkflowID="abraam-project3" 
-      - destroy-environment
-      - revert-migrations
+
 
   cleanup:
     docker:
