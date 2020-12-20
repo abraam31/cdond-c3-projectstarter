@@ -20,7 +20,7 @@
   become: yes
   ignore_errors: True
   unarchive:
-    src: ~/project/env.tar
+    src: ~/project/backend/env.tar
     dest: ~/app/backend
     
 - name: Start PM2
