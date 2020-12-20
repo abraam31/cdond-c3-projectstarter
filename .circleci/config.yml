@@ -264,7 +264,7 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text`
-            export API_URL="https://${BACKEND_IP}:3030"
+            export API_URL="http://${BACKEND_IP}:3030"
             echo ${API_URL} > API_URL 
       - persist_to_workspace:
           root: .
@@ -384,23 +384,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-backend
-      - build-frontend
-      - deploy-infrastructure:
-            requires:
-                - build-backend
-      - configure-infrastructure:
-            requires:
-                - deploy-infrastructure
-      - run-migrations:
-            requires:
-                - configure-infrastructure
-      - deploy-frontend:
-            requires:
-                - run-migrations      
-      - deploy-backend:
-            requires:
-                - deploy-frontend 
+      - deploy-frontend   
       - smoke-test:
             requires:
-                - deploy-backend
+                - deploy-frontend
