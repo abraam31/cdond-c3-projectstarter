@@ -366,7 +366,8 @@ jobs:
             curl -I $API_URL
             if [[ $? -ne 0 ]]; then
                 echo "api is not reachable"
-                exit 1        
+                exit 1 
+            fi
             
       - run:
           name: Frontend smoke test.
