@@ -66,7 +66,8 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - backend/dist/*
+            - backend/*
+            
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -129,6 +130,7 @@ jobs:
           command: |
             cd backend
             npm audit fix 
+            
       - exit-pipeline
             
   deploy-infrastructure:
@@ -213,8 +215,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          key: "frontend-build1"
       - run:
           name: Run migrations
           command: |
@@ -304,9 +304,29 @@ jobs:
       - run:
           name: compressing
           command: |
-            cd backend 
-            tar cvf artifacts.tar dist/
+            tar cvf artifacts.tar backend/
+            
+      - run:
+          name: Run migrations
+          command: |
+            touch backend/.env
+            echo -e "ENVIRONMENT=production" >> backend/.env
+            echo -e "TYPEORM_CONNECTION=$TYPEORM_CONNECTION" >> backend/.env
+            echo -e "TYPEORM_ENTITIES=$TYPEORM_ENTITIES" >> backend/.env
+            echo -e "NODE_ENV=production" >> backend/.env
+            echo -e "TYPEORM_HOST=$TYPEORM_HOST" >> backend/.env
+            echo -e "TYPEORM_PORT=$TYPEORM_PORT" >> backend/.env
+            echo -e "TYPEORM_USERNAME=$TYPEORM_USERNAME" >> backend/.env
+            echo -e "TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR" >> backend/.env 
+            echo -e "TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS" >> backend/.env
+            echo -e "TYPEORM_PASSWORD=$TYPEORM_PASSWORD" >> backend/.env
+            echo -e "TYPEORM_DATABASE=$TYPEORM_DATABASE" >> backend/.env
+            echo -e VERSION=1 >> backend/.env
 
+      - run:
+          name: compressing env
+          command: |
+            tar cvf env.tar backend/.env
       - run:
           name: Deploy backend
           command: |
@@ -337,6 +357,7 @@ jobs:
           name: Backend smoke test.
           command: |
             #/bin/bash
+            sleep 60s
             API_URL=`cat API_URL`
             echo "${API_URL}"                  
             curl -I $API_URL
@@ -362,18 +383,6 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
-      - test-backend:
-            requires:
-                - build-backend  
-      - test-frontend:
-            requires:
-                - build-frontend 		  
-      - scan-backend:
-            requires:
-                - test-backend   
-      - scan-frontend:
-            requires:
-                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - build-backend
