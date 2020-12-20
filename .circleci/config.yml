@@ -141,10 +141,6 @@ jobs:
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
-    filters:
-      branches:
-        only:
-          - master  
     steps:
       - checkout
       - run:
