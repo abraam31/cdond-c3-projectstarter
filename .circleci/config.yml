@@ -326,7 +326,10 @@ jobs:
       - run:
           name: compressing env
           command: |
-            tar cvf env.tar backend/.env
+            cd backend
+            tar cvf env.tar .env
+            cd ..
+            
       - run:
           name: Deploy backend
           command: |
