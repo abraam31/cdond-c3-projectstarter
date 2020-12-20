@@ -154,8 +154,6 @@ jobs:
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
-      - image: python:3.7-alpine3
-
     steps:
       - checkout
       - run: 
@@ -210,7 +208,6 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3
-      - image: amazon/aws-cli
     steps:
       - checkout
       - add_ssh_keys:
@@ -221,6 +218,10 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
+            apk add --update python3
+            apk add --update py3-pip
+            pip3 install --upgrade pip 
+            pip3 install awscli
             cat /tmp/ansible/inventory.txt
             ls 
             ls .circleci 
@@ -368,8 +369,6 @@ jobs:
   smoke-test:
     docker:
       - image: alpine
-      - image: amazon/aws-cli
-      - image: circleci/node:13.8.0
       
     steps:
       - checkout
@@ -381,6 +380,11 @@ jobs:
             apk add --update tar 
             apk add --update gzip 
             apk add --update curl
+            apk add --update python3
+            apk add --update py3-pip
+            pip3 install --upgrade pip 
+            pip3 install awscli
+            
       - run:
           name: Get backend url
           command: |
