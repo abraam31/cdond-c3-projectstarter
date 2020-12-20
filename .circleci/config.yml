@@ -16,11 +16,11 @@ commands:
     parameters:
         backendStack:
             type: string
-            default: "udapeople-back-$WorkFlowID"
+            default: "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}"
 
         frontendStack:
             type: string
-            default: "udapeople-front-$WorkFlowID"
+            default: "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}"
             
     steps:
       - run:
@@ -425,23 +425,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-backend
-      - build-frontend
-      - deploy-infrastructure:
-            requires:
-                - build-backend
-      - configure-infrastructure:
-            requires:
-                - deploy-infrastructure
-      - run-migrations:
-            requires:
-                - configure-infrastructure
-      - deploy-frontend:
-            requires:
-                - run-migrations   
-      - deploy-backend:
-            requires:
-                - deploy-frontend
+      - deploy-frontend
       - smoke-test:
             requires:
-                - deploy-backend
+                - deploy-frontend
