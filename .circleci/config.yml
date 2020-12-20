@@ -429,10 +429,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
           name: Update cloudfront distribution
           command: |
             aws cloudformation deploy \
@@ -453,6 +449,7 @@ jobs:
           command: |
             export OldWorkflowID="nncnrkojjx1khgmm9"
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" --stack-status-filter CREATE_COMPLETE --no-paginate --output text))      - run:
+      - run:            
           name: Remove old stacks and files
           command: |
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]; then 
