@@ -375,8 +375,8 @@ jobs:
             #!/bin/bash
             FRONT_URL="http://udapeople-abraam-project3.s3-website-us-east-1.amazonaws.com"
             #/bin/bash
-            curl -I $URL
-            if curl -s ${URL} | grep "Welcome"; then
+            curl -I $FRONT_URL
+            if curl -s $FRONT_URL | grep "Welcome"; then
                 exit 1
             else
                 exit 0
