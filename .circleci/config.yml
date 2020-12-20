@@ -377,7 +377,7 @@ jobs:
           name: Get backend url
           command: |
             #!/bin/bash
-            ls 
+            ls  /tmp 
             echo "-------------"
             export API_URL="`cat /tmp/API_URL`/api/status"            
             echo "${API_URL} " > API_URL     
@@ -465,7 +465,7 @@ workflows:
              
       - smoke-test:
             requires:
-                - deploy-backend
+                - deploy-frontend
 
       - cloudfront-update:
             requires:
