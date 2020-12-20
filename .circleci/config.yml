@@ -293,7 +293,8 @@ jobs:
                 --filters "Name=tag:project,Values=udapeople" \
                 --output text`
             export API_URL="http://${BACKEND_IP}:3030"
-            echo ${API_URL} > API_URL 
+            echo ${API_URL} > API_URL
+            
       - persist_to_workspace:
           root: .
           paths:
@@ -434,7 +435,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --tags project=udapeople \
-              --stack-name "udapeople-cloudfront-${CIRCLE_WORKFLOW_ID:0-7}" \
+              --stack-name "abraam-cdn" \
               --parameter-overrides WorkflowID="abraam-project3" 
       - destroy-environment
       - revert-migrations
@@ -463,18 +464,6 @@ workflows:
     jobs:
       - build-backend
       - build-frontend
-      - test-backend:
-            requires:
-                - build-backend  
-      - test-frontend:
-            requires:
-                - build-frontend 		  
-      - scan-backend:
-            requires:
-                - test-backend   
-      - scan-frontend:
-            requires:
-                - test-frontend 
       - deploy-infrastructure:
             requires:
                 - build-backend
@@ -501,9 +490,9 @@ workflows:
 
       - cloudfront-update:
             requires:
-                - deploy-backend
+                - smoke-test
 
       - cleanup:
             requires:
-                - deploy-backend
+                - cloudfront-update
                   
