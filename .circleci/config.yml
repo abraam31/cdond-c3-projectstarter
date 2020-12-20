@@ -27,9 +27,27 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
+            aws s3 rm "s3://udapeople-abraam-project3" --recursive
             aws cloudformation delete-stack --stack-name << parameters.backendStack >>
             aws cloudformation delete-stack --stack-name << parameters.frontendStack >>
 
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow. 
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            SUCCESS=`curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "1" https://api.memstash.io/values/migration_$CIRCLE_WORKFLOW_ID`
+            if(( $SUCCESS==1 )); 
+            then
+               cd ~/project/backend
+               npm install
+               npm run migrations:revert
+               exit 1
+            fi
+            
 jobs:
   build-frontend:
     docker:
@@ -189,7 +207,8 @@ jobs:
                 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.
+      - image: amazon/aws-cli
     steps:
       - checkout
       - add_ssh_keys:
@@ -209,7 +228,8 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
-
+      - destroy-environment
+      
   run-migrations:
     docker:
       - image: circleci/node:13.8.0
@@ -243,11 +263,13 @@ jobs:
             #!/bin/bash
             cd backend
             cat migration
-            curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "migration" https://api.memstash.io/values/migration_$CIRCLE_WORKFLOW_ID
-
+            curl -H "Content-Type: text/plain" -H "token: 4764f73f-07a8-44fd-87ed-4fe7d5793d20" --request PUT --data "1" https://api.memstash.io/values/migration_$CIRCLE_WORKFLOW_ID
+      - revert-migrations
+      
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
@@ -282,10 +304,14 @@ jobs:
       - run:
           name: copy files to s3
           command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
-
+      - destroy-environment
+      - revert-migrations
+      
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:  
       - checkout
       - add_ssh_keys:
@@ -334,11 +360,15 @@ jobs:
           name: Deploy backend
           command: |
             ansible-playbook -vvv -i ansible/inventory.txt .circleci/ansible/deploy-backend.yml
-            
+      - destroy-environment
+      - revert-migrations           
 
   smoke-test:
     docker:
       - image: alpine
+      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
+      
     steps:
       - checkout
       - attach_workspace:
@@ -381,11 +411,29 @@ jobs:
             else
                 exit 0
             fi                 
-
+      - destroy-environment
+      - revert-migrations
+      
 workflows:
   default:
     jobs:
-      - deploy-frontend   
-      - smoke-test:
+      - build-backend
+      - build-frontend
+      - deploy-infrastructure:
+            requires:
+                - build-backend
+      - configure-infrastructure:
+            requires:
+                - deploy-infrastructure
+      - run-migrations:
+            requires:
+                - configure-infrastructure
+      - deploy-frontend:
+            requires:
+                - run-migrations   
+      - deploy-backend:
             requires:
                 - deploy-frontend
+      - smoke-test:
+            requires:
+                - deploy-backend
