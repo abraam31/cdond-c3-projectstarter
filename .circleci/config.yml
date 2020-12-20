@@ -163,23 +163,7 @@ jobs:
           command: |
             yum -y install tar gzip
 
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-back-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="abraam-project3"
-              
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-front-${CIRCLE_WORKFLOW_ID:0-7}" \
-              --parameter-overrides ID="abraam-project3" 
+
               
       - run:
           name: Add back-end ip to ansible inventory
@@ -393,6 +377,8 @@ jobs:
           name: Get backend url
           command: |
             #!/bin/bash
+            ls 
+            echo "-------------"
             export API_URL="`cat /tmp/API_URL`/api/status"            
             echo "${API_URL} " > API_URL     
             
@@ -459,11 +445,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-backend
-      - build-frontend
-      - deploy-infrastructure:
-            requires:
-                - build-backend
+      - deploy-infrastructure
 
       - configure-infrastructure:
             requires:
