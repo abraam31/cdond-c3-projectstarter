@@ -311,7 +311,7 @@ jobs:
             
       - run:
           name: copy files to s3
-          command: aws s3 cp frontend/dist s3://udapeople-abraam-project3/ --recursive
+          command: aws s3 cp frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0-7}/ --recursive
       - destroy-environment
       - revert-migrations
       
@@ -438,7 +438,7 @@ jobs:
               --template-file .circleci/files/cloudfront.yml \
               --tags project=udapeople \
               --stack-name "udapeople-cloudfront" \
-              --parameter-overrides WorkflowID="abraam-project3" 
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0-7}" 
 
 
   cleanup:
