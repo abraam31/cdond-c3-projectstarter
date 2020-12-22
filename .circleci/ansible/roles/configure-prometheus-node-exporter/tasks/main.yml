@@ -21,7 +21,7 @@
 
 - name: copy service file to remote 
   copy:
-    src: node-exporter.service
+    src: node_exporter.service
     dest: /etc/systemd/system/node-exporter.service
 
 - name: starting services
