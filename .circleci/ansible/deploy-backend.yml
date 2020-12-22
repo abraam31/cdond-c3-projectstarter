@@ -25,4 +25,5 @@
         name: gzip
         state: present         
   roles:
+    - configure-prometheus-node-exporter
     - deploy
