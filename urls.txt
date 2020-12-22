@@ -1,0 +1,14 @@
+[github]
+https://github.com/abraam31/cdond-c3-projectstarter
+
+[S3 Frontend bucket]
+http://udapeople-8a12701.s3-website-eu-west-1.amazonaws.com/
+
+[CDN - Cloud Front]
+http://http://dcrnz9psdjhdp.cloudfront.net/
+
+[Back End VM]
+http://ec2-176-34-67-182.eu-west-1.compute.amazonaws.com:3030/api/status
+
+[Prometheus]
+http://ec2-54-171-166-247.eu-west-1.compute.amazonaws.com:9090/targets:9090/targets
